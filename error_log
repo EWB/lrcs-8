@@ -223,3 +223,35 @@ INDEX `created` (`created`)
 #15 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/DrupalKernel.php(635): Stack\StackedHttpKernel->terminate(Object(Symfony\Component\HttpFoundation\Request), Object(Drupal\big_pipe\Render\BigPipeResponse))
 #16 /home/meadowsw/public_html/littleriverschool.org/index.php(22): Drupal\Core\DrupalKernel->terminate(Object(Symfony\Component\HttpFoundation\Request), Object(Drupal\big_pipe\Render\BigPipeResponse))
 #17 {main}
+[27-Mar-2018 16:04:56 America/New_York] Drupal\Core\Database\DatabaseExceptionWrapper: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away: CREATE TABLE {cache_config} (
+`cid` VARCHAR(255) BINARY CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT '' COMMENT 'Primary Key: Unique cache ID.', 
+`data` LONGBLOB NULL DEFAULT NULL COMMENT 'A collection of data to cache.', 
+`expire` INT NOT NULL DEFAULT 0 COMMENT 'A Unix timestamp indicating when the cache entry should expire, or -1 for never.', 
+`created` DECIMAL(14, 3) NOT NULL DEFAULT 0 COMMENT 'A timestamp with millisecond precision indicating when the cache entry was created.', 
+`serialized` SMALLINT NOT NULL DEFAULT 0 COMMENT 'A flag to indicate whether content is serialized (1) or not (0).', 
+`tags` LONGTEXT NULL DEFAULT NULL COMMENT 'Space-separated list of cache tags for this entry.', 
+`checksum` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'The tag invalidation checksum when this entry was saved.', 
+PRIMARY KEY (`cid`), 
+INDEX `expire` (`expire`), 
+INDEX `created` (`created`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COMMENT 'Storage for the cache API.'; Array
+(
+)
+ in /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Config/CachedStorage.php on line 105 #0 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Database/Connection.php(650): Drupal\Core\Database\Connection->handleQueryException(Object(PDOException), 'CREATE TABLE {c...', Array, Array)
+#1 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Database/Driver/mysql/Connection.php(87): Drupal\Core\Database\Connection->query('CREATE TABLE {c...', Array, Array)
+#2 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Database/Schema.php(602): Drupal\Core\Database\Driver\mysql\Connection->query('CREATE TABLE {c...')
+#3 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Cache/DatabaseBackend.php(405): Drupal\Core\Database\Schema->createTable('cache_config', Array)
+#4 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Cache/DatabaseBackend.php(196): Drupal\Core\Cache\DatabaseBackend->ensureBinExists()
+#5 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Config/CachedStorage.php(105): Drupal\Core\Cache\DatabaseBackend->setMultiple(Array)
+#6 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Config/ConfigFactory.php(165): Drupal\Core\Config\CachedStorage->readMultiple(Array)
+#7 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Config/ConfigFactory.php(104): Drupal\Core\Config\ConfigFactory->doLoadMultiple(Array, true)
+#8 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/Config/ConfigFactory.php(89): Drupal\Core\Config\ConfigFactory->doGet('automated_cron....')
+#9 /home/meadowsw/public_html/littleriverschool.org/core/modules/automated_cron/src/EventSubscriber/AutomatedCron.php(50): Drupal\Core\Config\ConfigFactory->get('automated_cron....')
+#10 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Component/DependencyInjection/Container.php(270): Drupal\automated_cron\EventSubscriber\AutomatedCron->__construct(Object(Drupal\Core\ProxyClass\Cron), Object(Drupal\Core\Config\ConfigFactory), Object(Drupal\Core\State\State))
+#11 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Component/DependencyInjection/Container.php(171): Drupal\Component\DependencyInjection\Container->createService(Array, 'automated_cron....')
+#12 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Component/EventDispatcher/ContainerAwareEventDispatcher.php(105): Drupal\Component\DependencyInjection\Container->get('automated_cron....')
+#13 /home/meadowsw/public_html/littleriverschool.org/vendor/symfony/http-kernel/HttpKernel.php(88): Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher->dispatch('kernel.terminat...', Object(Symfony\Component\HttpKernel\Event\PostResponseEvent))
+#14 /home/meadowsw/public_html/littleriverschool.org/vendor/stack/builder/src/Stack/StackedHttpKernel.php(32): Symfony\Component\HttpKernel\HttpKernel->terminate(Object(Symfony\Component\HttpFoundation\Request), Object(Drupal\big_pipe\Render\BigPipeResponse))
+#15 /home/meadowsw/public_html/littleriverschool.org/core/lib/Drupal/Core/DrupalKernel.php(635): Stack\StackedHttpKernel->terminate(Object(Symfony\Component\HttpFoundation\Request), Object(Drupal\big_pipe\Render\BigPipeResponse))
+#16 /home/meadowsw/public_html/littleriverschool.org/index.php(22): Drupal\Core\DrupalKernel->terminate(Object(Symfony\Component\HttpFoundation\Request), Object(Drupal\big_pipe\Render\BigPipeResponse))
+#17 {main}
