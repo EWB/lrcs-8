@@ -109,9 +109,26 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Contai
     $form['#attributes']['class'] = ['views-bulk-edit-form'];
     $form['#attached']['library'][] = 'views_bulk_edit/views_bulk_edit.edit_form';
 
+    $form['options'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Options'),
+    ];
+    $form['options']['_add_values'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add values to multi-value fields'),
+      '#description' => $this->t('New values of multi-value fields will be added to the existing ones instead of overwriting them.'),
+    ];
+
+    $bundle_count = 0;
     foreach ($bundle_data as $entity_type_id => $bundles) {
       foreach ($bundles as $bundle => $label) {
-        $form = $this->getBundleForm($entity_type_id, $bundle, $label, $form, $form_state);
+        $bundle_count++;
+      }
+    }
+
+    foreach ($bundle_data as $entity_type_id => $bundles) {
+      foreach ($bundles as $bundle => $label) {
+        $form = $this->getBundleForm($entity_type_id, $bundle, $label, $form, $form_state, $bundle_count);
       }
     }
 
@@ -251,11 +268,13 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Contai
    *   Form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form_state object.
+   * @param int $bundle_count
+   *   Number of bundles that may be affected.
    *
    * @return array
    *   Edit form for the current entity bundle.
    */
-  protected function getBundleForm($entity_type_id, $bundle, $bundle_label, array $form, FormStateInterface $form_state) {
+  protected function getBundleForm($entity_type_id, $bundle, $bundle_label, array $form, FormStateInterface $form_state, $bundle_count) {
     $entityType = $this->entityTypeManager->getDefinition($entity_type_id);
     $entity = $this->entityTypeManager->getStorage($entity_type_id)->create([
       $entityType->getKey('bundle') => $bundle,
@@ -273,7 +292,8 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Contai
       $bundle_label = $entityType->getLabel();
     }
     $form[$entity_type_id][$bundle] = [
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => ($bundle_count === 1),
       '#title' => $entityType->getLabel() . ' - ' . $bundle_label,
       '#parents' => [$entity_type_id, $bundle],
     ];
@@ -308,6 +328,7 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Contai
       '#title' => $this->t('Select fields to change'),
       '#weight' => -50,
       '#tree' => TRUE,
+      '#attributes' => ['class' => ['vbe-selector-fieldset']],
     ];
 
     foreach (Element::children($form) as $key) {
@@ -418,6 +439,8 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Contai
         }
       }
     }
+
+    $this->configuration['_add_values'] = $form_state->getValue('_add_values');
   }
 
   /**
@@ -430,6 +453,22 @@ class ModifyEntityValues extends ViewsBulkOperationsActionBase implements Contai
     $result = $this->t('Skip (field is not present on this bundle)');
     if (isset($this->configuration[$type_id][$bundle])) {
       foreach ($this->configuration[$type_id][$bundle] as $field => $value) {
+        if (!empty($this->configuration['_add_values'])) {
+          $storageDefinition = $entity->{$field}->getFieldDefinition()->getFieldStorageDefinition();
+          $cardinality = $storageDefinition->get('cardinality');
+          if ($cardinality === $storageDefinition::CARDINALITY_UNLIMITED || $cardinality > 1) {
+            $current_value = $entity->{$field}->getValue();
+            $value_count = count($current_value);
+            foreach ($value as $item) {
+              if ($cardinality != $storageDefinition::CARDINALITY_UNLIMITED && $value_count >= $cardinality) {
+                break;
+              }
+              $current_value[] = $item;
+            }
+            $value = $current_value;
+          }
+        }
+
         $entity->{$field}->setValue($value);
       }
       $entity->save();
